@@ -128,11 +128,17 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   }
   console.log(3);
 
-  /*if (payment == "visa") {
+  if (payment == "visa") {
     // STripe Payment
     const stripe = new Stripe(process.env.STRIPE_KEY);
 
     let existCoupon;
+    if (order.coupon.name !== undefined) {
+      existCoupon = await stripe.coupons.create({
+        percent_off: order.coupon.discount,
+        duration: "once",
+      });
+    }
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -150,8 +156,9 @@ export const createOrder = asyncHandler(async (req, res, next) => {
       }),
       discounts: existCoupon ? [{ coupon: existCoupon.id }] : [],
     });
+    return res.json({success:true, results:session.url})
   }
-*/
+
   // response
   return res.json({
     success: true,
