@@ -31,5 +31,5 @@ export const resetPasswordSchema = joi.object({
     email:joi.string().email().required(),
     forgetCode: joi.string().required(),
     password:joi.string().required(),
-    confirmPassword:joi.string().valid(joi.ref("Password")).required(),
+    confirmPassword:joi.string().valid(joi.ref("password")).required(),
 }).required()
