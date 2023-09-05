@@ -2,12 +2,11 @@ import { User } from "../../../DB/models/user.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import bcryptjs from 'bcryptjs'
 import crypto from 'crypto'
-import  {sendEmail}  from "../../utils/sendEmails.js";
 import  jwt  from "jsonwebtoken";
 import randomstring from 'randomstring';
 import { Token } from "../../../DB/models/token.model.js";
+import {sendEmail} from "../../utils/sendEmails.js"
 import {Cart} from "../../../DB/models/cart.model.js"
-
 export const register=asyncHandler(async(req , res ,next)=>{
     //data from request
     const {userName , email , password} = req.body;
@@ -27,7 +26,6 @@ export const register=asyncHandler(async(req , res ,next)=>{
     const html=`
     <button class="border rounded-pill  " ><a href="${link}">Activate Email</a></button>
     `
-
     //send Email
     const isSent= await sendEmail({to:email,subject:"Activate Account" , html})
     //send response

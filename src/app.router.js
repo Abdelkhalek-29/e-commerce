@@ -9,6 +9,13 @@ import orderRouter from "./modules/order/order.router.js";
 
 export const appRouter = (app, express) => {
   //global middleware
+  app.use((req, res, next) => {
+    // req.orignalUrl
+    if (req.originalurl === "/order/webhook") {
+      return next();
+    }
+    express.json()(req, res, next);
+  });
   app.use(express.json());
   //Routes
   //auth
