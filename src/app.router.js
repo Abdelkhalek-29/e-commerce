@@ -6,7 +6,7 @@ import productRouter from "./modules/product/prouduct.router.js";
 import couponRouter from "./modules/coupon/coupon.router.js";
 import cartRouter from "./modules/cart/cart.router.js";
 import orderRouter from "./modules/order/order.router.js";
-
+import reviewRouter from "./modules/review/review.router.js"
 export const appRouter = (app, express) => {
   //global middleware
   app.use((req, res, next) => {
@@ -38,6 +38,9 @@ export const appRouter = (app, express) => {
 
   // Cart
   app.use("/cart", cartRouter);
+
+  // Review
+  app.use("/review",reviewRouter)
 
   // order
   app.use("/order", orderRouter);
