@@ -106,8 +106,6 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   order.invoice = { id: public_id, url: secure_url };
   await order.save();
 
-  console.log(11);
-
   // send email
   const isSent = await sendEmail({
     to: user.email,
@@ -119,14 +117,12 @@ export const createOrder = asyncHandler(async (req, res, next) => {
       },
     ],
   });
-  console.log(2);
   if (isSent) {
     // update stock
     updateStock(order.products, true);
     // clear cart
     clearCart(user._id);
   }
-  console.log(3);
 
   if (payment == "visa") {
     // STripe Payment
@@ -142,8 +138,8 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      metadata:{order_id:order._id.toString()},
-      success_url: proccess.env.SUCCESS_URL,
+      metadata: { order_id: order._id.toString() },
+      success_url:process.env.SUCCESS_URL,
       cancel_url: process.env.CANCEL_URL,
       line_items: order.products.map((product) => {
         return {
@@ -184,31 +180,32 @@ export const cancelOrder = asyncHandler(async (req, res, next) => {
 
 // webhock
 export const orderWebhock = asyncHandler(async (request, response) => {
-
-  const stripe=new stripe(process.env.STRIPE_KEY)
+  const stripe = new stripe(process.env.STRIPE_KEY);
   const sig = request.headers["stripe-signature"];
 
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(request.body, sig, process.env.ENDPOINT_SECRITE);
+    event = stripe.webhooks.constructEvent(
+      request.body,
+      sig,
+      process.env.ENDPOINT_SECRITE
+    );
   } catch (err) {
     response.status(400).send(`Webhook Error: ${err.message}`);
     return;
   }
 
   // Handle the event
-  const orderId=event.data.object.metadata.order_id
+  const orderId = event.data.object.metadata.order_id;
 
- if(event.type ==="check.session.completed"){
-  //change order status 
-  await Order.findOneAndUpdate({_id:orderId} ,{status:"visa payed"})
+  if (event.type === "check.session.completed") {
+    //change order status
+    await Order.findOneAndUpdate({ _id: orderId }, { status: "visa payed" });
+    return;
+  }
+  await Order.findOneAndUpdate({ _id: orderId }, { status: "failed to pay" });
   return;
-
- }
- await Order.findOneAndUpdate({_id:orderId} ,{status:"failed to pay"})
- return
-
 
   // Return a 200 response to acknowledge receipt of the event
   response.send();
