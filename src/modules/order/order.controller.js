@@ -182,7 +182,7 @@ export const cancelOrder = asyncHandler(async (req, res, next) => {
 export const orderWebhock = asyncHandler(async (request, response) => {
   const stripe = new Stripe(process.env.STRIPE_KEY);
   const sig = request.headers["stripe-signature"];
-  console.log(1);
+ // console.log(1);
   let event;
 
   try {

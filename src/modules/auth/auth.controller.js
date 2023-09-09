@@ -123,7 +123,7 @@ export const resetPassword = asyncHandler(async (req , res , next) =>{
     if(user.forgetCode !== req.body.forgetCode)
       return next(new Error("Invalid code !"));
     
-    user=await User.findOneAndUpdate({email :req.body.email} ,{$unset : {forgetCode :1}});
+    user=await User.findOneAndUpdate({email :req.body.email} ,{$unset : {forgetCode :1}} ,{new:true});
     if(!user)
     return next(new Error("Invalid email !"))
     user.password = bcryptjs.hashSync(req.body.password,Number(process.env.SALT_ROUND));

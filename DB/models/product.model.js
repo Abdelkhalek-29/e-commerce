@@ -3,7 +3,11 @@ import mongoose, { Schema, Types, model } from "mongoose";
 // schema
 const productSchema = new Schema(
   {
-    reviews:[{id:{type:Types.ObjectId,ref:"Review"}}],
+    reviews: [{ id: { type: Types.ObjectId, ref: "Review" } }],
+    wishlist: {
+      type: [String],                   // Array of user emails
+      default: [],
+    },
     name: { type: String, required: true, min: 2, max: 20 },
     description: String,
     images: [
@@ -59,10 +63,10 @@ productSchema.query.customSelect = function (fields) {
 };
 
 // stock function
-productSchema.methods.Instock=function(requiredQuantity) {
+productSchema.methods.Instock = function (requiredQuantity) {
   // this >>> doc >>> product document
-  return this.availableItems >= requiredQuantity ? true:false
-}
+  return this.availableItems >= requiredQuantity ? true : false;
+};
 
 // model
 export const Product =

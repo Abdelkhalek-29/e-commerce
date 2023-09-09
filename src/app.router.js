@@ -10,13 +10,13 @@ import reviewRouter from "./modules/review/review.router.js";
 export const appRouter = (app, express) => {
   //global middleware
   app.use((req, res, next) => {
-    // req.orignalUrl
-    if (req.originalurl === "/order/webhook") {
-      return next();
+    console.log(req.originalUrl);
+    if (req.originalUrl == "/order/webhook") {
+      next();
     }
     express.json()(req, res, next);
   });
-  app.use(express.json());
+
   //Routes
   //auth
   app.use("/auth", authRouter);

@@ -5,8 +5,9 @@ import { Product } from "../../../DB/models/product.model.js";
 import { Category } from "../../../DB/models/category.model.js";
 import { Subcategory } from "../../../DB/models/subcategory.model.js";
 import { Brand } from "../../../DB/models/brand.model.js";
+import { sendEmail } from "../../utils/sendEmails.js";
 
-// create product
+// add product
 export const addProduct = asyncHandler(async (req, res, next) => {
   // check category
   const category = await Category.findById(req.body.category);
@@ -85,23 +86,44 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
 
 // all product
 export const allProducts = asyncHandler(async (req, res, next) => {
-
-  if(req.params.categoryId){
-    const category = await Category.findById(req.params.categoryId)
-    if(!category) 
-    return next(new Error("Category not dound !" ,{cause:404}))
+  if (req.params.categoryId) {
+    const category = await Category.findById(req.params.categoryId);
+    if (!category)
+      return next(new Error("Category not dound !", { cause: 404 }));
   }
 
-  const products = await Product.find({...req.query})
+  const products = await Product.find({ ...req.query })
     .paginate(req.query.page)
     .customSelect(req.query.fields)
     .sort(req.query.sort);
   return res.json({ success: true, results: products });
 });
 
+// single product
+export const singleProduct = asyncHandler(async (req, res, next) => {
+  const product = await Product.findById(req.params.productId);
+  return res.json({ success: true, results: product });
+});
 
-// single product               /// problem !!!!
-export const singleProduct = asyncHandler(async(req,res,next) =>{
-  const product = await Product.findById(req.params.productId)
-  return res.json({success: true , results:product}) 
-})
+export const whishList = asyncHandler(async (req, res, next) => {
+  const { email, productId, quantity } = req.body;
+
+  const product = await Product.findById(productId);
+  if (!product) {
+    return next(new Error("product not found"));
+  }
+  const wishlist = product.wishlist || [];
+  wishlist.push(email);
+  product.wishlist = wishlist;
+  await product.save();
+
+  if (product.Instock(quantity)) {
+    wishlist.forEach((email) => {
+      sendEmail({
+        to: email,
+        subject: `product ${productId} is now available `,
+      });
+    });
+  }
+  return res.json({success:true , message:"product available"})
+});

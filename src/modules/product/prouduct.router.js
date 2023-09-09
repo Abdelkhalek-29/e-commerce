@@ -5,7 +5,7 @@ import { fileUpload } from "../../utils/multer.js";
 import { filterObject } from "../../utils/multer.js";
 import { isValid } from "../../middleware/validation.middleware.js";
 import {ProductIdSchema, createProductschema} from "./product.validation.js"
-import { addProduct, allProducts, deleteProduct ,singleProduct } from "./product.controller.js";
+import { addProduct, allProducts, deleteProduct,singleProduct ,whishList } from "./product.controller.js";
 const router=Router({mergeParams:true})
 
 
@@ -23,7 +23,7 @@ isValid(createProductschema),
 addProduct)
 
 // single product 
-router.get("/single/productId",isValid(ProductIdSchema),singleProduct)
+router.get("/single/:productId",isValid(ProductIdSchema),singleProduct)
 
 // delete product
 router.delete("/:productId",
@@ -35,4 +35,7 @@ deleteProduct
 
 // get all products
 router.get("/" , allProducts)
+
+// add to wish list
+router.post("/wishlist",whishList)
 export default router
