@@ -19,7 +19,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
 
   // check coupon
   let checkCoupon;
-  if (checkCoupon) {
+  if (coupon) {
     checkCoupon = await Coupon.findOne({
       neme: coupon,
       expiredAt: { $gt: Date.now() },
@@ -179,35 +179,30 @@ export const cancelOrder = asyncHandler(async (req, res, next) => {
 });
 
 // webhock
-export const orderWebhock = asyncHandler(async (request, response) => {
+export const orderWebhock = asyncHandler(async (request, res) => {
   const stripe = new Stripe(process.env.STRIPE_KEY);
   const sig = request.headers["stripe-signature"];
- // console.log(1);
+  // console.log(1);
   let event;
 
-  try {
-    event = stripe.webhooks.constructEvent(
-      request.body,
-      sig,
-      process.env.ENDPOINT_SECRITE
-    );
-  } catch (err) {
-    response.status(400).send(`webhook Error:${err.message}`);
-    return;
-  }
+  event = stripe.webhooks.constructEvent(
+    request.body,
+    sig,
+    process.env.ENDPOINT_SECRITE
+  );
   console.log(2);
 
   // Handle the event
   const orderId = event.data.object.metadata.order_id;
   console.log(3);
-
-  if (event.type === "check.session.completed") {
+console.log(event.type)
+  if (event.type == "checkout.session.completed") {
     //change order status
     await Order.findOneAndUpdate({ _id: orderId }, { status: "visa payed" });
-    return;
-  }
+    return res.json({ message: "Done" });
+  }else{
   console.log(4);
-
   await Order.findOneAndUpdate({ _id: orderId }, { status: "failed to pay" });
-  return;
+  return res.json({ message: "failed" });
+  }
 });

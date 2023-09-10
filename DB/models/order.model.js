@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types,model } from "mongoose";
+import mongoose, { Schema, Types, model } from "mongoose";
 
 const orderSchema = new Schema(
   {
@@ -19,14 +19,21 @@ const orderSchema = new Schema(
     price: { type: Number, required: true },
 
     coupon: {
-      id: {type:Types.ObjectId,
-      ref: "Coupon"},
+      id: { type: Types.ObjectId, ref: "Coupon" },
       name: String,
       discount: { type: Number, min: 1, max: 100 },
     },
     status: {
       type: String,
-      enum: ["placed", "shipped", "deliverd", "canceled", "refunded" ,"visa paid","failed to pay"],
+      enum: [
+        "placed",
+        "shipped",
+        "deliverd",
+        "canceled",
+        "refunded",
+        "visa paid",
+        "failed to pay",
+      ],
       default: "placed",
     },
     payment: {
